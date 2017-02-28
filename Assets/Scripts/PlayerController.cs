@@ -4,8 +4,11 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
-    public bool isArrowKey = false;
+
+public bool isArrowKey = false;
     public List<GameObject> objects;
+    public List<GameObject> getObjectsW;
+    public List<GameObject> getObjectsB;
 
     //public float jumpSpeed = 8.0F;
     //public float gravity = 20.0F;
@@ -25,6 +28,32 @@ public class PlayerController : MonoBehaviour
                 obj.GetComponent<ObjectController>().change_color();
             }
         }
+
+        if (isArrowKey && Input.GetKeyDown(KeyCode.RightShift))
+        {
+            foreach (GameObject obj in objects)
+            {
+                if (obj.CompareTag("Pickup"))
+                {
+                    obj.SetActive(false);
+                    getObjectsW.Add(obj);
+                }
+            }
+        }
+
+        if (!isArrowKey && Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            foreach (GameObject obj in objects)
+            {
+                if(obj.CompareTag("Pickup"))
+                {
+                    obj.SetActive(false);
+                    getObjectsB.Add(obj);
+                }
+            }
+        }
+  
+        
     }
 
     public void touch_object(GameObject obj)
