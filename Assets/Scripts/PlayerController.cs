@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
     public bool isArrowKey = false;
     public List<GameObject> objects;
+    public List<GameObject> inventory;
+    public List<GameObject> temp_list = new List<GameObject>();
 
-    //public float jumpSpeed = 8.0F;
-    //public float gravity = 20.0F;
     public float speed = 6.0F;
     public float rotate_speed = 80.0F;
     private float forward = 0F;
@@ -25,6 +24,29 @@ public class PlayerController : MonoBehaviour
                 obj.GetComponent<ObjectController>().change_color();
             }
         }
+
+        if (isArrowKey && Input.GetKeyDown(KeyCode.RightShift) || !isArrowKey && Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            foreach (GameObject obj in objects)
+            {
+                Debug.Log(obj.tag);
+                if (obj.tag == "Pickup")
+                {
+                    temp_list.Add(obj);
+                }
+            }
+
+            foreach (GameObject obj in temp_list)
+                interact(obj);
+        }
+    }
+
+    /* Pick up or put down objects */
+    public void interact(GameObject obj)
+    {
+        obj.SetActive(false);
+        inventory.Add(obj);
+        leave_object(obj);
     }
 
     public void touch_object(GameObject obj)
@@ -40,15 +62,6 @@ public class PlayerController : MonoBehaviour
     void movement()
     {
         CharacterController controller = GetComponent<CharacterController>();
-        //if (controller.isGrounded)
-        //{
-        //    moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        //    moveDirection = transform.TransformDirection(moveDirection);
-        //    moveDirection *= speed;
-        //    if (Input.GetButton("Jump"))
-        //        moveDirection.y = jumpSpeed;
-        //}
-        //moveDirection.y -= gravity * Time.deltaTime;
         forward = 0F;
         if ((isArrowKey && Input.GetKey(KeyCode.UpArrow)) || (!isArrowKey && Input.GetKey(KeyCode.W)))
         {
