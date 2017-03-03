@@ -8,32 +8,51 @@ public class TeleporterController : MonoBehaviour {
 
     private bool isArrowKey;
     private GameObject player;
-    private GameObject game;
+    private PlayerController player_controller;
     private GameObject obj;
+    //private GameObject game;
 
     // Use this for initialization
     void Start()
     {
         player = transform.parent.FindChild("Player").gameObject;
-        isArrowKey = player.GetComponent<PlayerController>().isArrowKey;
-        game = GameObject.Find("GameController");
+        player_controller = player.GetComponent<PlayerController>();
+        isArrowKey = player_controller.isArrowKey;
+        //isArrowKey = player.GetComponent<PlayerController>().isArrowKey;
+        //game = GameObject.Find("GameController");
+    }
+
+    void onTriggerEnter(Collider other)
+    {
+        Debug.Log("Enter");
+        player_controller.enter_teleport_zone();
+    }
+
+    void onTriggerExit(Collider other)
+    {
+        Debug.Log("Exit");
+        player_controller.exit_teleport_zone();
     }
 
     void OnTriggerStay(Collider other)
     {
         //Debug.Log("In trigger");
-        if ((isArrowKey && Input.GetKeyDown(KeyCode.RightShift) || !isArrowKey && Input.GetKeyDown(KeyCode.LeftShift)))
+        if ((isArrowKey && Input.GetKeyUp(KeyCode.RightShift) || !isArrowKey && Input.GetKeyUp(KeyCode.LeftShift)))
         {
-            List<GameObject> inventory = player.GetComponent<PlayerController>().inventory;
             Debug.Log("Player interact with Teleporter");
-            if (inventory.Count > 0)
+            List<GameObject> inventory = player_controller.inventory;
+            if (transform.childCount == 0 && inventory.Count > 0)
             {
                 obj = inventory[0];
-                obj.transform.SetParent(transform);
-                obj.transform.localPosition = new Vector3(0, 1, 0);
-                obj.SetActive(true);
-
+                put_on_teleporter(obj);
                 inventory.Remove(obj);
+            }
+            else if (transform.childCount > 0 && inventory.Count == 0)
+            {
+                obj = transform.GetChild(0).gameObject;
+                //get_from_teleporter(obj);
+                //inventory.Add(obj);
+                player_controller.pick_up(obj);
             }
         }
 
@@ -41,10 +60,27 @@ public class TeleporterController : MonoBehaviour {
         {
             if (transform.childCount > 0) // There is object on teleporter
             {
-                obj = transform.GetChild(0).gameObject;
-                obj.transform.SetParent(other_teleporter);
-                obj.transform.localPosition = new Vector3(0, 1, 0);
+                teleport(transform.GetChild(0).gameObject);
             }
         }
+    }
+
+    //void get_from_teleporter(GameObject obj)
+    //{
+    //    obj.transform.SetParent(transform.parent);
+    //    obj.SetActive(false);
+    //}
+
+    void put_on_teleporter(GameObject obj)
+    {
+        obj.transform.SetParent(transform);
+        obj.transform.localPosition = new Vector3(0, 1, 0);
+        obj.SetActive(true);
+    }
+
+    void teleport(GameObject obj)
+    {
+        obj.transform.SetParent(other_teleporter);
+        obj.transform.localPosition = new Vector3(0, 1, 0);
     }
 }

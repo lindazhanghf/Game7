@@ -10,7 +10,7 @@ public class GameController : MonoBehaviour
     public Transform black_world;
     public GameObject[] models;
 
-    private List<string> color_pairs;
+    public List<string> color_pairs;
 
     void start()
     {
@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour
 
     public bool check_game()
     {
-        //color_pairs.Clear();
+        color_pairs.Clear();
         foreach (Transform obj in white_world)
         {
             if (obj.gameObject.tag == "Object") // TODO pickup color_pairs
@@ -34,13 +34,11 @@ public class GameController : MonoBehaviour
             {
                 if (color_pairs.Contains(obj.gameObject.name + obj.GetComponent<ObjectController>().isWhite.ToString())) // If "ObjectName+color" already exist in the list, then they have the same color, test fail
                 {
-                    color_pairs.Clear();
                     return false;
                 }
             }
         }
         Debug.Log("Puzzle solved!!!!!");
-        color_pairs.Clear();
         return true;
     }
 }

@@ -58,6 +58,6 @@ public class ObjectController : MonoBehaviour {
         //    curr_color = !curr_color;
         //}
 
-        game.GetComponent<GameController>().check_game();
+        //game.GetComponent<GameController>().check_game();
     }
 }
