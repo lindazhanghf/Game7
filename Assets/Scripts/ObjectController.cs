@@ -15,7 +15,6 @@ public class ObjectController : MonoBehaviour {
     {
         player = transform.parent.FindChild("Player").gameObject;
         game = GameObject.Find("GameController");
-
     }
 
     void OnTriggerEnter(Collider other)
