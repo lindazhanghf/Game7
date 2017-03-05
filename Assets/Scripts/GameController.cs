@@ -8,14 +8,37 @@ public class GameController : MonoBehaviour
     public Transform glass;
     public Transform white_world;
     public Transform black_world;
+    public Material color_white;
+    public Material color_black;
     public GameObject[] models;
 
     public List<string> color_pairs;
 
-    void start()
+    private GameObject new_obj;
+    private float x;
+    private float z;
+
+    void Start()
     {
         color_pairs = new List<string>();
+
         //spawn objects
+        for (int i = 0; i < models.Length; i++)
+        //foreach (GameObject obj in models)
+        {
+            x = Random.Range(-8f, 8f);
+            z = Random.Range(2f, 18f);
+            new_obj = (GameObject) Instantiate(models[i], new Vector3(), Quaternion.identity);
+            new_obj.transform.position = new Vector3(x, 0, z);
+            new_obj.transform.SetParent(black_world);
+            new_obj.GetComponent<ObjectController>().Initialize();
+
+            new_obj = (GameObject)Instantiate(models[i], new Vector3(), Quaternion.identity);
+            new_obj.transform.position = new Vector3(-x, 0, -z);
+            new_obj.transform.SetParent(white_world);
+            new_obj.GetComponent<ObjectController>().Initialize();
+
+        }
     }
 
     public bool check_game()

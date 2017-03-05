@@ -11,7 +11,7 @@ public class ObjectController : MonoBehaviour {
     public GameObject game;
     private bool curr_color = true; // true for white, false for black
 
-    void Start()
+    public void Initialize()
     {
         player = transform.parent.FindChild("Player").gameObject;
         game = GameObject.Find("GameController");
