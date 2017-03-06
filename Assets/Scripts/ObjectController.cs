@@ -15,6 +15,7 @@ public class ObjectController : MonoBehaviour {
     {
         player = transform.parent.FindChild("Player").gameObject;
         game = GameObject.Find("GameController");
+        change_material();
     }
 
     void OnTriggerEnter(Collider other)
@@ -42,21 +43,27 @@ public class ObjectController : MonoBehaviour {
 
 
         isWhite = !isWhite;
-        curr_color = isWhite;
+        change_material();
+    }
+
+    public void change_material()
+    {
         if (isWhite)
             GetComponent<MeshRenderer>().material = white;
         else
             GetComponent<MeshRenderer>().material = black;
 
-        //Material[] mesh = GetComponent<MeshRenderer>().materials;
-        //for (int i = 0; i < mesh.Length; i++)
-        //{
-        //    Debug.Log(mesh[i]);
-        //    if (curr_color)
-        //        mesh[i] = white;
-        //    curr_color = !curr_color;
-        //}
+        curr_color = isWhite;
+        Material[] mesh = GetComponent<MeshRenderer>().materials;
+        for (int i = 0; i < mesh.Length; i++)
+        {
+            Debug.Log(mesh[i]);
+            if (curr_color)
+                mesh[i] = white;
+            else
+                mesh[i] = black;
 
-        //game.GetComponent<GameController>().check_game();
+            curr_color = !curr_color;
+        }
     }
 }
