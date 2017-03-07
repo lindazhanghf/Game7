@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
     private float z;
     private bool color_1;// True for white, false for black
     private bool color_2;
+    private Vector3 rotation;
 
     void Start()
     {
@@ -33,15 +34,18 @@ public class GameController : MonoBehaviour
             random_color();
             x = Random.Range(-8, 9);
             z = Random.Range(2, 19);
+            rotation = Vector3.up * Random.value * 360;
             obj_b = (GameObject)Instantiate(models[i], new Vector3(x, 0, z), Quaternion.identity);
             obj_b.transform.SetParent(black_world);
             obj_b.GetComponent<ObjectController>().isWhite = color_1;
             obj_b.GetComponent<ObjectController>().Initialize(i > 6 ? true : false);
+            obj_b.transform.Rotate(rotation);
 
             obj_w = (GameObject)Instantiate(models[i], new Vector3(-x, 0, -z), Quaternion.identity);
             obj_w.transform.SetParent(white_world);
             obj_w.GetComponent<ObjectController>().isWhite = color_2;
             obj_w.GetComponent<ObjectController>().Initialize(i > 6 ? true : false);
+            obj_w.transform.Rotate(rotation + Vector3.up * 180);
 
             if (i == 6) // Rotate bench model to the right side up
             {

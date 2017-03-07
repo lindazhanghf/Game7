@@ -21,7 +21,7 @@ public class ObjectController : MonoBehaviour {
         player_controller = player.GetComponent<PlayerController>();
         game = GameObject.Find("GameController");
         change_material();
-        transform.Rotate(Vector3.up * Random.value * 360);
+        
     }
 
     void OnTriggerEnter(Collider other)
