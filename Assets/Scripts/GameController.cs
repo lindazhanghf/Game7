@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
     public GameObject[] models;
     public GameObject apple;
     public List<string> color_pairs;
+    public List<string> apple_strings;
 
     private GameObject obj_b;
     private GameObject obj_w;
@@ -90,6 +91,8 @@ public class GameController : MonoBehaviour
     public bool check_game()
     {
         color_pairs.Clear();
+        apple_strings.Clear();
+
         foreach (Transform obj in white_world)
         {
             if (obj.gameObject.tag == "Object") // TODO pickup color_pairs
@@ -98,11 +101,14 @@ public class GameController : MonoBehaviour
                 color_pairs.Add(obj.gameObject.name + contrl.isWhite.ToString()); // Stringify the object to "ObjectName+color"
                 if (contrl.isTree)
                 {
-                    Debug.Log(contrl.ToString() + " is a tree");
-                    if (obj.transform.FindChild("Hanger0").childCount > 0)
-                        color_pairs.Add(obj.gameObject.name + "Apple" + obj.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
-                    if (obj.transform.FindChild("Hanger1").childCount > 0)
-                        color_pairs.Add(obj.gameObject.name + "Apple" + obj.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+                    if (get_apple_strings("White", obj) == false)
+                        return false;
+                    // if (obj.transform.FindChild("Hanger0").childCount > 0) {
+                    //     apple_strings.Add("whiteWorld" + obj.gameObject.name + obj.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+                    // }
+                    // if (obj.transform.FindChild("Hanger1").childCount > 0) {
+                    //     apple_strings.Add("whiteWorld" + obj.gameObject.name + obj.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+                    // }
                 }
             }
         }
@@ -116,18 +122,50 @@ public class GameController : MonoBehaviour
 
                 if (contrl.isTree)
                 {
-                    if (obj.transform.FindChild("Hanger0").childCount > 0
-                        && color_pairs.Contains(obj.gameObject.name + obj.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString()))
+                    if (get_apple_strings("Black", obj) == false)
                         return false;
-                    if (obj.transform.FindChild("Hanger1").childCount > 0
-                        && color_pairs.Contains(obj.gameObject.name + obj.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString()))
-                        return false;
+                    // if (obj.transform.FindChild("Hanger0").childCount > 0) {
+                    //     apple_strings.Add("blackWorld" + obj.gameObject.name + obj.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+                    // }
+                    // if (obj.transform.FindChild("Hanger1").childCount > 0) {
+                    //     apple_strings.Add("blackWorld" + obj.gameObject.name + obj.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+                    // }
                 }
             }
         }
+
+        if (apple_strings.Count == 4)
+        {
+            if (apple_strings[0] != apple_strings[2] && apple_strings[1] != apple_strings[3])
+                return false;
+        }
+        else
+            return false;
+
         Debug.Log("Puzzle solved!!!!!");
         glass.GetComponent<AudioSource>().Play();
         won = true;
+        return true;
+    }
+
+    /* Return false (puzzle fail) if one tree have both apples */
+    private bool get_apple_strings(string world_color, Transform tree)
+    {
+        bool has_apple = false;
+        //Debug.Log(world_color);
+        if (tree.transform.FindChild("Hanger0").childCount > 0)
+        {
+            apple_strings.Add(world_color + "World");
+            apple_strings.Add(tree.gameObject.name + tree.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+            has_apple = true;
+        }
+        if (has_apple && tree.transform.FindChild("Hanger1").childCount > 0)
+            return false;
+        if (!has_apple && tree.transform.FindChild("Hanger1").childCount > 0)
+        {
+            apple_strings.Add(world_color + "World");
+            apple_strings.Add(tree.gameObject.name + tree.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+        }
         return true;
     }
 

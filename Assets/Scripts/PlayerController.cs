@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class PlayerController : MonoBehaviour
 
     public GameObject game;
     public bool isTeleporting;
+    public GameObject apple_black;
+    public GameObject apple_white;
+
+    private AudioSource inventory_zipper;
 
     public float speed = 6.0F;
     public float rotate_speed = 80.0F;
@@ -19,6 +24,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         game = GameObject.Find("GameController");
+        inventory_zipper = GameObject.Find("Inventory_bag").GetComponent<AudioSource>();
         isTeleporting = false;
     }
 
@@ -35,6 +41,11 @@ public class PlayerController : MonoBehaviour
             foreach (GameObject obj in inventory)
             {
                 obj.GetComponent<ObjectController>().change_color();
+                both_inactive();
+                if (obj.GetComponent<ObjectController>().isWhite)
+                    apple_white.SetActive(true);
+                else
+                    apple_black.SetActive(true);
             }
             game.GetComponent<GameController>().check_game();
         }
@@ -75,7 +86,16 @@ public class PlayerController : MonoBehaviour
         obj.transform.SetParent(transform);
         inventory.Add(obj);
         if (objects.Contains(obj))
-            leave_object(obj);  
+            leave_object(obj);
+
+        // UI - inventory
+        both_inactive();
+        if (obj.GetComponent<ObjectController>().isWhite)
+            apple_white.SetActive(true);
+        else
+            apple_black.SetActive(true);
+
+        inventory_zipper.Play();
     }
 
     public void put_back(GameObject tree)
@@ -90,6 +110,18 @@ public class PlayerController : MonoBehaviour
         objects.Add(apple);
         apple.transform.localPosition = Vector3.zero;
         apple.SetActive(true);
+
+        // UI - inventory
+        both_inactive();
+
+        inventory_zipper.Play();
+    }
+
+    /* UI - inventory */
+    public void both_inactive()
+    {
+        apple_white.SetActive(false);
+        apple_black.SetActive(false);
     }
 
     public void touch_object(GameObject obj)

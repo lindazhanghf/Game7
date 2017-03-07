@@ -10,7 +10,7 @@ public class TeleporterController : MonoBehaviour {
     private GameObject player;
     private PlayerController player_controller;
     private GameObject obj;
-    //private GameObject game;
+    private AudioSource inventory_zipper;
 
     // Use this for initialization
     void Start()
@@ -18,8 +18,7 @@ public class TeleporterController : MonoBehaviour {
         player = transform.parent.FindChild("Player").gameObject;
         player_controller = player.GetComponent<PlayerController>();
         isArrowKey = player_controller.isArrowKey;
-        //isArrowKey = player.GetComponent<PlayerController>().isArrowKey;
-        //game = GameObject.Find("GameController");
+        inventory_zipper = GameObject.Find("Inventory_bag").GetComponent<AudioSource>();
     }
 
     void onTriggerEnter(Collider other)
@@ -46,6 +45,7 @@ public class TeleporterController : MonoBehaviour {
                 obj = inventory[0];
                 put_on_teleporter(obj);
                 inventory.Remove(obj);
+                player_controller.both_inactive();
             }
             else if (transform.childCount > 0 && inventory.Count == 0)
             {
@@ -76,6 +76,8 @@ public class TeleporterController : MonoBehaviour {
         obj.transform.SetParent(transform);
         obj.transform.localPosition = new Vector3(0, 1, 0);
         obj.SetActive(true);
+
+        inventory_zipper.Play();
     }
 
     void teleport(GameObject obj)

@@ -9,7 +9,7 @@ public class ObjectController : MonoBehaviour {
     public Material black;
     private GameObject player;
     private PlayerController player_controller;
-    private GameObject game;
+    //private GameObject game;
     public bool isTree = false;
     private bool curr_color = true; // true for white, false for black
     private Material[] mesh;
@@ -19,7 +19,7 @@ public class ObjectController : MonoBehaviour {
         isTree = is_Tree;
         player = transform.parent.FindChild("Player").gameObject;
         player_controller = player.GetComponent<PlayerController>();
-        game = GameObject.Find("GameController");
+        //game = GameObject.Find("GameController");
         change_material();
         
     }
