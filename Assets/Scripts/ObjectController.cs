@@ -8,31 +8,49 @@ public class ObjectController : MonoBehaviour {
     public Material white;
     public Material black;
     private GameObject player;
-    public GameObject game;
+    private PlayerController player_controller;
+    private GameObject game;
+    public bool isTree = false;
     private bool curr_color = true; // true for white, false for black
+    private Material[] mesh;
 
-    public void Initialize()
+    public void Initialize(bool is_Tree)
     {
+        isTree = is_Tree;
         player = transform.parent.FindChild("Player").gameObject;
+        player_controller = player.GetComponent<PlayerController>();
         game = GameObject.Find("GameController");
         change_material();
+        transform.Rotate(Vector3.up * Random.value * 360);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        //Debug.Log(other.ToString() + " entered the trigger");
         if (other.gameObject == player)
         {
-            player.GetComponent<PlayerController>().touch_object(transform.gameObject);
+            player_controller.touch_object(transform.gameObject);
+            if (isTree)
+            {
+                if (transform.FindChild("Hanger0").childCount > 0)
+                    player_controller.touch_object(transform.FindChild("Hanger0").GetChild(0).gameObject);
+                if (transform.FindChild("Hanger1").childCount > 0)
+                    player_controller.touch_object(transform.FindChild("Hanger1").GetChild(0).gameObject);
+            }
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        //Debug.Log(other.ToString() + " exited the trigger");
         if (other.gameObject == player)
         {
-            player.GetComponent<PlayerController>().leave_object(transform.gameObject);
+            player_controller.leave_object(transform.gameObject);
+            if (isTree)
+            {
+                if (transform.FindChild("Hanger0").childCount > 0)
+                    player_controller.leave_object(transform.FindChild("Hanger0").GetChild(0).gameObject);
+                if (transform.FindChild("Hanger1").childCount > 0)
+                    player_controller.leave_object(transform.FindChild("Hanger1").GetChild(0).gameObject);
+            }
         }
     }
 
@@ -41,23 +59,20 @@ public class ObjectController : MonoBehaviour {
         if (transform.parent.name == "Teleporter")
             return;
 
-
         isWhite = !isWhite;
         change_material();
     }
 
     public void change_material()
     {
-        if (isWhite)
-            GetComponent<MeshRenderer>().material = white;
-        else
-            GetComponent<MeshRenderer>().material = black;
-
+        //if (isWhite)
+        //    GetComponent<MeshRenderer>().material = white;
+        //else
+        //    GetComponent<MeshRenderer>().material = black;
         curr_color = isWhite;
-        Material[] mesh = GetComponent<MeshRenderer>().materials;
+        mesh = GetComponent<MeshRenderer>().materials;
         for (int i = 0; i < mesh.Length; i++)
         {
-            Debug.Log(mesh[i]);
             if (curr_color)
                 mesh[i] = white;
             else
@@ -65,5 +80,7 @@ public class ObjectController : MonoBehaviour {
 
             curr_color = !curr_color;
         }
+
+        GetComponent<MeshRenderer>().materials = mesh;
     }
 }

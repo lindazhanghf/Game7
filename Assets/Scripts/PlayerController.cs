@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
     public bool isArrowKey = false;
     public List<GameObject> objects;
     public List<GameObject> inventory;
-    public List<GameObject> temp_list = new List<GameObject>();
 
     public GameObject game;
     public bool isTeleporting;
@@ -30,6 +29,11 @@ public class PlayerController : MonoBehaviour
         {
             foreach (GameObject obj in objects)
             {
+                if (obj.tag == "Object")
+                    obj.GetComponent<ObjectController>().change_color();
+            }
+            foreach (GameObject obj in inventory)
+            {
                 obj.GetComponent<ObjectController>().change_color();
             }
             game.GetComponent<GameController>().check_game();
@@ -37,22 +41,34 @@ public class PlayerController : MonoBehaviour
 
         if (!isTeleporting && (isArrowKey && Input.GetKeyDown(KeyCode.RightShift) || !isArrowKey && Input.GetKeyDown(KeyCode.LeftShift)))
         {
-            foreach (GameObject obj in objects)
+            if (inventory.Count > 0)
             {
-                //Debug.Log(obj.tag);
-                if (obj.tag == "Pickup")
+                foreach (GameObject obj in objects)
                 {
-                    temp_list.Add(obj);
-                    Debug.Log("Picked up");
+                    if (obj.GetComponent<ObjectController>().isTree)
+                    {
+                        put_back(obj);
+                        Debug.Log("Put back " + obj.ToString());
+                        game.GetComponent<GameController>().check_game();
+                        break;
+                    }
                 }
+                return;
             }
 
-            foreach (GameObject obj in temp_list)
-                pick_up(obj);
+            foreach (GameObject obj in objects)
+            {
+                if (obj.tag == "Pickup")
+                {
+                    pick_up(obj);
+                    Debug.Log("Picked up " + obj.ToString());
+                    break;
+                }
+            }
         }
     }
 
-    /* Pick up or put down objects */
+    /* Pick up objects */
     public void pick_up(GameObject obj)
     {
         obj.SetActive(false);
@@ -60,6 +76,20 @@ public class PlayerController : MonoBehaviour
         inventory.Add(obj);
         if (objects.Contains(obj))
             leave_object(obj);  
+    }
+
+    public void put_back(GameObject tree)
+    {
+        GameObject apple = inventory[0];
+        if (tree.transform.FindChild("Hanger0").childCount == 0)
+            apple.transform.SetParent(tree.transform.FindChild("Hanger0"));
+        else
+            apple.transform.SetParent(tree.transform.FindChild("Hanger1"));
+
+        inventory.Remove(apple);
+        objects.Add(apple);
+        apple.transform.localPosition = Vector3.zero;
+        apple.SetActive(true);
     }
 
     public void touch_object(GameObject obj)
