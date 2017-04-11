@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class GameController : MonoBehaviour
     public GameObject apple;
     public List<string> color_pairs;
     public List<string> apple_strings;
+    public GameObject text;
 
     private GameObject obj_b;
     private GameObject obj_w;
@@ -29,23 +31,29 @@ public class GameController : MonoBehaviour
         won = false;
         color_pairs = new List<string>();
 
+        int[] randome_ranges = new int[] { -10, 10, 2, 25 };
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            randome_ranges = new int[] { -10, 10, 2, 10 };
+        }
+
         //spawn objects
         for (int i = 0; i < models.Length; i++)
         {
             random_color();
-            x = Random.Range(-8, 9);
-            z = Random.Range(2, 19);
+            x = Random.Range(randome_ranges[0], randome_ranges[1]);
+            z = Random.Range(randome_ranges[2], randome_ranges[3]);
             rotation = Vector3.up * Random.value * 360;
             obj_b = (GameObject)Instantiate(models[i], new Vector3(x, 0, z), Quaternion.identity);
             obj_b.transform.SetParent(black_world);
             obj_b.GetComponent<ObjectController>().isWhite = color_1;
-            obj_b.GetComponent<ObjectController>().Initialize(i > 6 ? true : false);
+            obj_b.GetComponent<ObjectController>().Initialize();
             obj_b.transform.Rotate(rotation);
 
             obj_w = (GameObject)Instantiate(models[i], new Vector3(-x, 0, -z), Quaternion.identity);
             obj_w.transform.SetParent(white_world);
             obj_w.GetComponent<ObjectController>().isWhite = color_2;
-            obj_w.GetComponent<ObjectController>().Initialize(i > 6 ? true : false);
+            obj_w.GetComponent<ObjectController>().Initialize();
             obj_w.transform.Rotate(rotation + Vector3.up * 180);
 
             if (i == 6) // Rotate bench model to the right side up
@@ -82,9 +90,20 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        if (won && glass.position.y > -6)
+        if (won && glass.position.y > -20)
         {
             glass.position = glass.position + new Vector3(0, -5) * Time.deltaTime;
+        }
+        else if (won)
+        {
+            if (SceneManager.GetActiveScene().buildIndex == 0)
+            {
+                text.SetActive(true);
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                }
+            }
         }
     }
 
@@ -134,13 +153,30 @@ public class GameController : MonoBehaviour
             }
         }
 
-        if (apple_strings.Count == 4)
+        if (apple_strings.Count == 6)
         {
-            if (apple_strings[0] != apple_strings[2] && apple_strings[1] != apple_strings[3])
+            if (apple_strings[0] == apple_strings[3])
+            {
+                Debug.Log("Puzzle not solved: Same world");
                 return false;
+            }
+            if (apple_strings[1] != apple_strings[4])
+            {
+                Debug.Log("Puzzle not solved: Not same tree");
+                return false;
+            }
+            if (apple_strings[2] == apple_strings[5])
+            {
+                Debug.Log("Puzzle not solved: Apples have same color");
+                return false;
+            }
         }
         else
+        {
+            Debug.Log("Puzzle not solved: Number of apples not correct");
             return false;
+        }
+
 
         Debug.Log("Puzzle solved!!!!!");
         glass.GetComponent<AudioSource>().Play();
@@ -151,12 +187,29 @@ public class GameController : MonoBehaviour
     /* Return false (puzzle fail) if one tree have both apples */
     private bool get_apple_strings(string world_color, Transform tree)
     {
+        //bool has_apple = false;
+        ////Debug.Log(world_color);
+        //if (tree.transform.FindChild("Hanger0").childCount > 0)
+        //{
+        //    apple_strings.Add(world_color + "World");
+        //    apple_strings.Add(tree.gameObject.name + tree.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+        //    has_apple = true;
+        //}
+        //if (has_apple && tree.transform.FindChild("Hanger1").childCount > 0)
+        //    return false;
+        //if (!has_apple && tree.transform.FindChild("Hanger1").childCount > 0)
+        //{
+        //    apple_strings.Add(world_color + "World");
+        //    apple_strings.Add(tree.gameObject.name + tree.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+        //}
+        //return true;
         bool has_apple = false;
         //Debug.Log(world_color);
         if (tree.transform.FindChild("Hanger0").childCount > 0)
         {
             apple_strings.Add(world_color + "World");
-            apple_strings.Add(tree.gameObject.name + tree.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+            apple_strings.Add(tree.gameObject.name);
+            apple_strings.Add(tree.transform.FindChild("Hanger0").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
             has_apple = true;
         }
         if (has_apple && tree.transform.FindChild("Hanger1").childCount > 0)
@@ -164,9 +217,11 @@ public class GameController : MonoBehaviour
         if (!has_apple && tree.transform.FindChild("Hanger1").childCount > 0)
         {
             apple_strings.Add(world_color + "World");
-            apple_strings.Add(tree.gameObject.name + tree.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
+            apple_strings.Add(tree.gameObject.name);
+            apple_strings.Add(tree.transform.FindChild("Hanger1").GetChild(0).GetComponent<ObjectController>().isWhite.ToString());
         }
         return true;
+
     }
 
     private void random_color()

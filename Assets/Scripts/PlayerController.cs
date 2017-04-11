@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public GameObject apple_white;
 
     private AudioSource inventory_zipper;
+    private AudioSource magic_color;
 
     public float speed = 6.0F;
     public float rotate_speed = 80.0F;
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         game = GameObject.Find("GameController");
         inventory_zipper = GameObject.Find("Inventory_bag").GetComponent<AudioSource>();
+        magic_color = GetComponent<AudioSource>();
         isTeleporting = false;
     }
 
@@ -33,20 +35,27 @@ public class PlayerController : MonoBehaviour
         movement();
         if ((isArrowKey && Input.GetKeyDown(KeyCode.Return)) || (!isArrowKey && Input.GetKeyDown(KeyCode.Space)))
         {
+            bool color_changed = false;
             foreach (GameObject obj in objects)
             {
-                if (obj.tag == "Object")
+                if (obj.tag == "Object") {
                     obj.GetComponent<ObjectController>().change_color();
+                    color_changed = true;
+                }
             }
             foreach (GameObject obj in inventory)
             {
                 obj.GetComponent<ObjectController>().change_color();
+                color_changed = true;
                 both_inactive();
                 if (obj.GetComponent<ObjectController>().isWhite)
                     apple_white.SetActive(true);
                 else
                     apple_black.SetActive(true);
             }
+            if (color_changed)
+                magic_color.Play();
+
             game.GetComponent<GameController>().check_game();
         }
 

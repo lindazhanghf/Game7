@@ -14,9 +14,8 @@ public class ObjectController : MonoBehaviour {
     private bool curr_color = true; // true for white, false for black
     private Material[] mesh;
 
-    public void Initialize(bool is_Tree)
+    public void Initialize()
     {
-        isTree = is_Tree;
         player = transform.parent.FindChild("Player").gameObject;
         player_controller = player.GetComponent<PlayerController>();
         //game = GameObject.Find("GameController");
